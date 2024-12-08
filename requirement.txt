@@ -1,0 +1,12 @@
+fastapi
+pydantic
+uvicorn[standard]
+python-multipart
+numpy
+Pillow
+opencv-python
+tensorflow
+keras
+h5py
+scikit-learn
+tqdm
