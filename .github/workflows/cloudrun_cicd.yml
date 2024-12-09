@@ -37,7 +37,7 @@ jobs:
           no-cache: false
           tags: ${{ secrets.LOCATION_GCR_ML }}:${{ secrets.TAG_LATEST }}
 
-      - name: Deploy to Cloud Runn
+      - name: Deploy to Cloud Run
         run: |
           gcloud run deploy ${{ secrets.SERVICE_ML }} \
             --image ${{ secrets.LOCATION_GCR_ML }}:${{ secrets.TAG_LATEST }} \
