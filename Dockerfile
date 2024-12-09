@@ -17,7 +17,7 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port used by the app
-EXPOSE 8000
+EXPOSE 8080
 
 # Command to run the application
 CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080}"]
