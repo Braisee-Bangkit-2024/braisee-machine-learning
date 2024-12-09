@@ -1,20 +1,16 @@
-# Use a Python 3.10 slim image
-FROM python:3.10-slim
+FROM python:3.8-slim-buster
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-
-# Set the working directory
 WORKDIR /app
 
-# Copy the application files
-COPY . .
+COPY requirements.txt requirements.txt
 
-# Upgrade pip
 RUN pip install --upgrade pip
 
-# Install dependencies
 RUN pip install -r requirements.txt
+
+COPY . .
+
+ENV PYTHONUNBUFFERED=1
 
 # Expose the port
 EXPOSE 8000
