@@ -1,18 +1,23 @@
-FROM python:3.8-slim-buster
+# Use Python 3.9 slim image
+FROM python:3.9-slim
 
+# Install system dependencies for OpenCV
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory in the container
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
+# Copy the application files into the container
+COPY . /app
 
-RUN pip install --upgrade pip
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN pip install -r requirements.txt
+# Expose the port used by the app
+EXPOSE 8000
 
-COPY . .
-
-ENV PYTHONUNBUFFERED=1
-
-# Expose the port
-EXPOSE 8080
-
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+# Command to run the application
+CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080}"]
