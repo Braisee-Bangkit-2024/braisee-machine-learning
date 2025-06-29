@@ -1,14 +1,9 @@
-// Ini adalah cetak biru pipeline-mu.
 pipeline {
-    // 'agent any' artinya pekerjaan ini bisa dijalankan di server Jenkins mana saja yang tersedia.
     agent any
 
-    // 'stages' adalah kumpulan semua tahapan kerja.
     stages {
-        // 'stage' adalah satu tahapan spesifik. Beri nama yang jelas.
         stage('Checkout Code') {
             steps {
-                // 'checkout scm' adalah perintah standar untuk mengambil source code dari Git.
                 checkout scm
                 echo 'Kode berhasil diambil dari GitHub.'
             }
@@ -17,17 +12,38 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Memulai proses build Docker image...'
-                // 'sh' adalah cara Jenkins menjalankan perintah terminal.
-                // Ganti dengan perintah build docker-mu yang sebenarnya.
-                sh 'docker build . -t braisee-app:jenkins-build'
+                // Kita gunakan nama image yang sama dengan nama proyek untuk konsistensi
+                sh 'docker build . -t nendaseputra/braisee-app:latest'
                 echo 'Build Docker image selesai.'
             }
         }
 
         stage('Run Tests') {
             steps {
-                // Kosongkan dulu untuk sekarang. Nanti kita isi.
+                // Nanti kita isi dengan test yang sesungguhnya
                 echo 'Tahap testing... (lewatkan untuk saat ini)'
+            }
+        }
+
+        // =======================================================
+        // TAHAP BARU DIMULAI DARI SINI
+        // =======================================================
+        stage('Deploy Application') {
+            steps {
+                // 'script' block diperlukan untuk menjalankan logika shell yang lebih kompleks
+                script {
+                    // Beri nama yang konsisten pada kontainer aplikasimu
+                    def containerName = 'braisee-app-live'
+                    
+                    echo "Mencoba menghentikan dan menghapus kontainer lama: ${containerName}"
+                    // Perintah '|| true' adalah trik agar pipeline tidak gagal jika container tidak ditemukan
+                    sh "docker stop ${containerName} || true"
+                    sh "docker rm ${containerName} || true"
+                    
+                    echo "Menjalankan kontainer baru dari image nendaseputra/braisee-app:latest"
+                    // Jalankan kontainer baru dengan nama yang sudah kita definisikan
+                    sh "docker run -d --name ${containerName} -p 8080:8080 nendaseputra/braisee-app:latest"
+                }
             }
         }
     }
