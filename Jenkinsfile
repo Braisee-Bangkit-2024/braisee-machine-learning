@@ -28,21 +28,20 @@ pipeline {
         // =======================================================
         // TAHAP BARU DIMULAI DARI SINI
         // =======================================================
+// ... stage sebelumnya ...
+
         stage('Deploy Application') {
             steps {
-                // 'script' block diperlukan untuk menjalankan logika shell yang lebih kompleks
                 script {
-                    // Beri nama yang konsisten pada kontainer aplikasimu
                     def containerName = 'braisee-app-live'
                     
                     echo "Mencoba menghentikan dan menghapus kontainer lama: ${containerName}"
-                    // Perintah '|| true' adalah trik agar pipeline tidak gagal jika container tidak ditemukan
                     sh "docker stop ${containerName} || true"
                     sh "docker rm ${containerName} || true"
                     
                     echo "Menjalankan kontainer baru dari image nendaseputra/braisee-app:latest"
-                    // Jalankan kontainer baru dengan nama yang sudah kita definisikan
-                    sh "docker run -d --name ${containerName} -p 8080:8080 nendaseputra/braisee-app:latest"
+                    // PERUBAHAN DI SINI: Kita map ke port 8081 di host, tapi tetap menargetkan port 8080 di dalam container
+                    sh "docker run -d --name ${containerName} -p 8081:8080 nendaseputra/braisee-app:latest"
                 }
             }
         }
