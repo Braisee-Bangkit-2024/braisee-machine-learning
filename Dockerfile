@@ -1,6 +1,16 @@
 # Use Python 3.9 slim image
 FROM python:3.9-slim
 
+# Set environment variable untuk menghindari dialog interaktif saat instalasi
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies for OpenCV with more resilient options
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    # Bersihkan cache setelah instalasi untuk menjaga ukuran image tetap kecil
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Install system dependencies for OpenCV
 RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
