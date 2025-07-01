@@ -1,23 +1,28 @@
-# Use Python 3.9 slim image
-FROM python:3.9-slim
+# Gunakan base image yang spesifik
+FROM python:3.9-bullseye
 
-# Install system dependencies for OpenCV
-RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
+# Set environment variables untuk best practice
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# Set the working directory in the container
+# Instal dependensi sistem
 WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    libgl1-mesa-glx libglib2.0-0 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy the application files into the container
-COPY . /app
+# Buat user non-root untuk keamanan
+RUN addgroup --system app && adduser --system --group app
+USER app
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Salin sisa kode aplikasi
+COPY . .
 
-# Expose the port used by the app
+# Expose port (hanya untuk dokumentasi, Cloud Run tidak menggunakan ini)
 EXPOSE 8080
 
-# Command to run the application
+# CMD yang patuh pada platform Cloud
+# Ini adalah baris paling krusial
 CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080}"]
