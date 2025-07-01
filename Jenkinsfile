@@ -1,21 +1,68 @@
-# Resep Definitif untuk Misi Google Cloud
-FROM jenkins/jenkins:lts-jdk17
+pipeline {
+    agent any
 
-USER root
+    environment {
+        // Alamat LENGKAP ke repositori Artifact Registry-mu
+        ARTIFACT_REGISTRY_REPO = 'asia-southeast2-docker.pkg.dev/stately-bulwark-464613-j5/jenkins-braisee'
+        
+        // Nama image aplikasimu
+        IMAGE_NAME             = 'braisee-app'
+        
+        // Konfigurasi Cloud Run
+        CLOUD_RUN_SERVICE      = 'braisee-service-ml' // Pastikan nama ini sesuai
+        CLOUD_RUN_REGION       = 'asia-southeast2'
+        GCP_PROJECT_ID         = 'stately-bulwark-464613-j5' // Pastikan Project ID ini benar
+    }
 
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    # Prasyarat
-    lsb-release curl gnupg apt-transport-https ca-certificates \
-    # Instal Docker CLI
-    && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
-    && apt-get update && apt-get install -y docker-ce-cli \
-    # Instal Google Cloud SDK
-    && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
-    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
-    && apt-get update && apt-get install -y google-cloud-sdk \
-    # Pembersihan
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Definisikan nama image lengkap menggunakan variabel yang benar
+                    def DOCKER_IMAGE = "${ARTIFACT_REGISTRY_REPO}/${IMAGE_NAME}:${BUILD_NUMBER}"
+                    echo "Building image: ${DOCKER_IMAGE}"
+                    sh "docker build -t ${DOCKER_IMAGE} ."
+                }
+            }
+        }
 
-USER jenkins
+        stage('Push Image to Artifact Registry') {
+            steps {
+                // withCredentials HARUS di dalam steps
+                withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GCP_KEYFILE')]) {
+                    script {
+                        def DOCKER_IMAGE = "${ARTIFACT_REGISTRY_REPO}/${IMAGE_NAME}:${BUILD_NUMBER}"
+                        def REGISTRY_HOSTNAME = 'https://asia-southeast2-docker.pkg.dev'
+
+                        echo "Authenticating to Artifact Registry and pushing image..."
+                        // Gunakan hostname yang benar untuk login
+                        sh "cat ${GCP_KEYFILE} | docker login -u _json_key --password-stdin ${REGISTRY_HOSTNAME}"
+                        sh "docker push ${DOCKER_IMAGE}"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Cloud Run') {
+            steps {
+                // withCredentials HARUS di dalam steps
+                withCredentials([file(credentialsId: 'gcp-sa-key', variable: 'GCP_KEYFILE')]) {
+                    script {
+                        def DOCKER_IMAGE = "${ARTIFACT_REGISTRY_REPO}/${IMAGE_NAME}:${BUILD_NUMBER}"
+                        
+                        echo "Deploying to Cloud Run service: ${CLOUD_RUN_SERVICE}"
+                        sh 'gcloud auth activate-service-account --key-file=${GCP_KEYFILE}'
+                        sh "gcloud config set project ${GCP_PROJECT_ID}"
+                        sh """
+                            gcloud run deploy ${CLOUD_RUN_SERVICE} \\
+                                --image ${DOCKER_IMAGE} \\
+                                --region ${CLOUD_RUN_REGION} \\
+                                --platform managed \\
+                                --allow-unauthenticated
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
