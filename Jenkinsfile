@@ -8,15 +8,15 @@ pipeline {
                 echo 'Kode berhasil diambil dari GitHub.'
             }
         }
-
-        stage('Build Docker Image') {
-            steps {
-                echo 'Memulai proses build Docker image...'
-                // Kita gunakan nama image yang sama dengan nama proyek untuk konsistensi
-                sh 'docker build . -t nendaseputra/braisee-app:latest'
-                echo 'Build Docker image selesai.'
-            }
-        }
+        
+stage('Build Docker Image') {
+    steps {
+        echo 'Memulai proses build Docker image...'
+        // PERUBAHAN DI SINI: Kita aktifkan BuildKit dan set network ke 'host'
+        sh 'DOCKER_BUILDKIT=1 docker build --network=host -t nendaseputra/braisee-app:latest .'
+        echo 'Build Docker image selesai.'
+    }
+}
 
         stage('Run Tests') {
             steps {
