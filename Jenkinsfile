@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+        triggers {
+        githubPush()
+    }
+
     environment {
         // Alamat LENGKAP ke repositori Artifact Registry-mu
         ARTIFACT_REGISTRY_REPO = 'asia-southeast2-docker.pkg.dev/stately-bulwark-464613-j5/jenkins-braisee'
