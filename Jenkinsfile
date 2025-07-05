@@ -25,7 +25,6 @@ pipeline {
                 }
             }
         }
- 
         stage('Push Image to Artifact Registry') {
             steps {
                 // withCredentials HARUS di dalam steps
