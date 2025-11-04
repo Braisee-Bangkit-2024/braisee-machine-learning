@@ -14,7 +14,7 @@ WORKDIR /app
 COPY . /app
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN --upgrade pip && pip install  --no-cache-dir -r requirements.txt
 
 # Expose the port used by the app
 EXPOSE 8080
