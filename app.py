@@ -8,6 +8,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 from tempfile import NamedTemporaryFile
 
+
 # Initialize FastAPI app
 app = FastAPI()
 
