@@ -1,6 +1,6 @@
 # Use Python 3.9 slim image
 FROM python:3.9-slim
-
+ 
 # Install system dependencies for OpenCV
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
