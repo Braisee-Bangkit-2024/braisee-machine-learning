@@ -3,7 +3,7 @@ pipeline {
     triggers {
         githubPush()
     }
-
+ 
     environment {
         ARTIFACT_REGISTRY_REPO = 'asia-southeast2-docker.pkg.dev/stately-bulwark-464613-j5/jenkins-braisee'
         IMAGE_NAME             = 'braisee-app'
