@@ -34,8 +34,10 @@ jobs:
         with:
           context: .
           push: true
-          no-cache: false
           tags: ${{ secrets.LOCATION_GCR_ML }}:${{ secrets.TAG_LATEST }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          
 
       - name: Deploy to Cloud Run
         run: |
