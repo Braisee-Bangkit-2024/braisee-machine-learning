@@ -34,9 +34,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.LOCATION_GCR_ML }}:${{ secrets.TAG_LATEST }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=max
+          tags: ${{ secrets.LOCATION_GCR_ML }}:${{ secrets.TAG_LATEST }}
           
 
       - name: Deploy to Cloud Run
