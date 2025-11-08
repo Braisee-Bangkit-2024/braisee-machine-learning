@@ -11,10 +11,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Copy the application files into the container
-COPY . /app
+COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install --upgrade pip  --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip --no-cache-dir -r requirements.txt
+
+COPY . .
 
 # Expose the port used by the app
 EXPOSE 8080
