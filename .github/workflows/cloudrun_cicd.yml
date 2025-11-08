@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-        - name: Debug GitHub Context
+      - name: Debug GitHub Context
         run: |
           echo "Repo: ${{ github.repository }}"
           echo "Ref: ${{ github.ref }}"
