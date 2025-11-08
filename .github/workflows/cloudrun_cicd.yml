@@ -24,12 +24,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug GitHub Context
-        run: |
-          echo "Repo: ${{ github.repository }}"
-          echo "Ref: ${{ github.ref }}"
-          exit 1 # Sengaja gagalkan job agar berhenti di sini
-
       # 2. Autentikasi ke Google Cloud (CEPAT via WIF)
       - name: Authenticate to Google Cloud
         uses: 'google-github-actions/auth@v2'
