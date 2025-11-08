@@ -35,68 +35,13 @@ jobs:
       - name: Setup gcloud CLI
         uses: 'google-github-actions/setup-gcloud@v2'
 
-name: Build and Deploy to Cloud Run
-
-on:
-  push:
-    branches: [ "main" ]
-
-# Variabel agar mudah diubah
-env:
-  PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  REGION: ${{ secrets.REGION }}
-  SERVICE_NAME: ${{ secrets.SERVICE_ML }}
-  IMAGE_TAG_URL: ${{ secrets.LOCATION_GCR_ML }}:${{ secrets.TAG_LATEST }}
-  
-jobs:
-  build_and_deploy:
-    runs-on: ubuntu-latest
-    
-    # 1. Izinkan GitHub membuat OIDC token
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # 2. Autentikasi ke Google Cloud (CEPAT via WIF)
-      - name: Authenticate to Google Cloud
-        uses: 'google-github-actions/auth@v2'
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-          service_account: ${{ secrets.GCP_SA_EMAIL }}
-
-      # 3. Setup gcloud (CEPAT - hanya hitungan detik)
-      - name: Setup gcloud CLI
-        uses: 'google-github-actions/setup-gcloud@v2'
-
-      # 4. Login ke Registry (GCR atau Artifact Registry)
+# 4. Login ke Registry (GCR atau Artifact Registry)
       - name: Configure Docker
-        run: gcloud auth configure-docker ${{ secrets.LOCATION_GCR_ML | split: '/' | 'gcloud_url' }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # 5. Build (CEPAT - menggunakan cache)
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: ${{ env.IMAGE_TAG_URL }}
-
-      # 6. Deploy (Tetap cepat)
-      - name: Deploy to Cloud Run
+        env:
+          IMAGE_PATH: ${{ secrets.LOCATION_GCR_ML }}
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image ${{ env.IMAGE_TAG_URL }} \
-            --region ${{ env.REGION }} \
-            --platform managed \
-            --allow-unauthenticated
+          HOSTNAME=$(echo $IMAGE_PATH | cut -d'/' -f1)
+          gcloud auth configure-docker $HOSTNAME
 
       # 5. Build (CEPAT - menggunakan cache)
       - name: Build and push Docker image
