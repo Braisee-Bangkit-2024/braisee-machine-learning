@@ -35,12 +35,13 @@ jobs:
       - name: Setup gcloud CLI
         uses: 'google-github-actions/setup-gcloud@v2'
 
-      # 4. Login ke Registry (GCR atau Artifact Registry)
+# 4. Login ke Registry (GCR atau Artifact Registry)
       - name: Configure Docker
-        run: gcloud auth configure-docker ${{ secrets.LOCATION_GCR_ML | split: '/' | 'gcloud_url' }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        env:
+          IMAGE_PATH: ${{ secrets.LOCATION_GCR_ML }}
+        run: |
+          HOSTNAME=$(echo $IMAGE_PATH | cut -d'/' -f1)
+          gcloud auth configure-docker $HOSTNAME
 
       # 5. Build (CEPAT - menggunakan cache)
       - name: Build and push Docker image
