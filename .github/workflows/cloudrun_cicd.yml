@@ -43,6 +43,12 @@ jobs:
           HOSTNAME=$(echo $IMAGE_PATH | cut -d'/' -f1)
           gcloud auth configure-docker $HOSTNAME
 
+      # --- TAMBAHKAN BLOK INI KEMBALI ---
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
+
       # 5. Build (CEPAT - menggunakan cache)
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
