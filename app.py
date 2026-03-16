@@ -9,7 +9,7 @@ from tensorflow.keras.preprocessing.image import img_to_array, load_img
 from tempfile import NamedTemporaryFile
   
 # Initialize FastAPI app
-app = FastAPI()
+app = FastAPI() 
   
 # Label dictionary
 label_dict = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7, 'i': 8,
