@@ -5,11 +5,11 @@ pipeline {
     }
  
     environment {
-        ARTIFACT_REGISTRY_REPO = 'asia-southeast2-docker.pkg.dev/stately-bulwark-464613-j5/jenkins-braisee'
+        ARTIFACT_REGISTRY_REPO = 'asia-southeast2-docker.pkg.dev/braisee-project/jenkins-braisee'
         IMAGE_NAME             = 'braisee-app'
         CLOUD_RUN_SERVICE      = 'braisee-service-ml'
         CLOUD_RUN_REGION       = 'asia-southeast2'
-        GCP_PROJECT_ID         = 'stately-bulwark-464613-j5'
+        GCP_PROJECT_ID         = 'braisee-project'
     }
 
     stages {
