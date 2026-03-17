@@ -2,7 +2,7 @@ pipeline {
     agent any
     triggers {
         githubPush()
-    } 
+    }
  
     environment {
         ARTIFACT_REGISTRY_REPO = 'asia-southeast2-docker.pkg.dev/braisee-project/jenkins-braisee'
